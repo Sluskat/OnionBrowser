@@ -12,13 +12,29 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Step 2: Build Onion Browser using the marketplace action
-    - name: iOS Build
-      uses: hectorguerrini/build-ios-action@v1.0.4
+    # Step 2: Build the app (no signing required)
+    - name: Build with xcodebuild
+      run: |
+        xcodebuild \
+          -project OnionBrowser.xcodeproj \
+          -scheme OnionBrowser \
+          -configuration Release \
+          -archivePath build/OnionBrowser.xcarchive \
+          archive \
+          CODE_SIGNING_ALLOWED=NO
+
+    # Step 3: Export IPA (using ExportOptions.plist)
+    - name: Export IPA
+      run: |
+        xcodebuild \
+          -exportArchive \
+          -archivePath build/OnionBrowser.xcarchive \
+          -exportPath build \
+          -exportOptionsPlist ExportOptions.plist
+
+    # Step 4: Upload IPA artifact
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v4
       with:
-        project-path: OnionBrowser.xcodeproj       # path to your .xcodeproj in root
-        scheme: OnionBrowser                       # scheme to build
-        configuration: Release                     # Release build
-        export-method: development                 # dev IPA for sideloading
-        disable-targets: OnionBrowser             # disables automatic signing
-        output-path: build/OnionBrowser.ipa       # where the IPA will be saved
+        name: OnionBrowser-IPA
+        path: build/*.ipa
