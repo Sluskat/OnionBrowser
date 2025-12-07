@@ -1,0 +1,35 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build with xcodebuild
+      run: |
+        xcodebuild \
+          -project OnionBrowser.xcodeproj \
+          -scheme OnionBrowser \
+          -configuration Release \
+          -archivePath build/OnionBrowser.xcarchive \
+          archive
+
+    - name: Export IPA
+      run: |
+        xcodebuild \
+          -exportArchive \
+          -archivePath build/OnionBrowser.xcarchive \
+          -exportPath build \
+          -exportOptionsPlist ExportOptions.plist
+
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: OnionBrowser-IPA
+        path: build/*.ipa
