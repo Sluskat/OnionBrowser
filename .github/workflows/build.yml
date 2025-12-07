@@ -11,15 +11,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Disable code signing
-      run: |
-        /usr/libexec/PlistBuddy -c "Set :CODE_SIGNING_REQUIRED NO" OnionBrowser/OnionBrowser.xcodeproj/project.pbxproj
-        /usr/libexec/PlistBuddy -c "Set :CODE_SIGN_IDENTITY ''" OnionBrowser/OnionBrowser.xcodeproj/project.pbxproj
-
     - name: Build with xcodebuild
       run: |
         xcodebuild \
-          -project OnionBrowser/OnionBrowser.xcodeproj \
+          -project OnionBrowser.xcodeproj \
           -scheme OnionBrowser \
           -configuration Release \
           -archivePath build/OnionBrowser.xcarchive \
