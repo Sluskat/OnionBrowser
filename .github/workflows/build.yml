@@ -11,14 +11,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install CocoaPods
+      run: |
+        sudo gem install cocoapods
+        pod install --project-directory=./OnionBrowser
+
+    - name: Disable code signing
+      run: |
+        /usr/libexec/PlistBuddy -c "Set :CODE_SIGNING_REQUIRED NO" OnionBrowser/OnionBrowser.xcodeproj/project.pbxproj
+        /usr/libexec/PlistBuddy -c "Set :CODE_SIGN_IDENTITY ''" OnionBrowser/OnionBrowser.xcodeproj/project.pbxproj
+
     - name: Build with xcodebuild
       run: |
         xcodebuild \
-          -project OnionBrowser.xcodeproj \
+          -workspace OnionBrowser/OnionBrowser.xcworkspace \
           -scheme OnionBrowser \
           -configuration Release \
           -archivePath build/OnionBrowser.xcarchive \
-          archive
+          archive \
+          CODE_SIGNING_ALLOWED=NO
 
     - name: Export IPA
       run: |
